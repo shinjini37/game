@@ -19,7 +19,6 @@ function Tile (props: ITileProps) {
     const style: any = {
         height: TILE_SIZE,
         width: TILE_SIZE,
-        display: 'inline-block'
     }
     
     if (colorNumber == 0) {

@@ -1,3 +1,4 @@
 .tile {
     border-radius: 1px;
+    display: inline-flex;
 }

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { KEY_PRESSED_ACTION} from '../../store/Actions';
+import { UP, DOWN, LEFT, RIGHT } from '../../game/GameConstants';
 
 interface IInputCaptureProperties {
     onKeyPressed: (e: KeyboardEvent) => void;
@@ -33,6 +34,12 @@ function mapStateToProps(state: any, ownProps: any) {
 function mapDispatchToProps(dispatch: Dispatch, ownProps: any) {
     return {
         onKeyPressed: (e: KeyboardEvent) => {
+            const eventCode = e.code;
+            if ([UP, DOWN, LEFT, RIGHT].indexOf(eventCode) >= 0) {
+                e.preventDefault();
+            }
+
+
             dispatch({
                 type: KEY_PRESSED_ACTION,
                 payload: {

@@ -2,15 +2,19 @@ import React, { Component } from 'react';
 import './LocalMap.css';
 import Tile from '../tile/Tile';
 import map1 from '../../assets/maps/map1.json';
+import CharacterLayer from './CharacterLayer';
 
 class LocalMap extends Component {
     render() {
         return (
-            <>{
-                map1.map((mapLayer, i) => (
-                    <MapLayer key={i} mapLayer={mapLayer}></MapLayer>
-                ))
-            }</>
+            <>
+                {
+                    map1.map((mapLayer, i) => (
+                        <MapLayer key={i} mapLayer={mapLayer}></MapLayer>
+                    ))
+                }
+                <CharacterLayer />
+            </>
         )
     }
 }

@@ -1,13 +1,23 @@
 import { createStore, Action } from 'redux';
 
-import { KEY_PRESSED_ACTION, TIMESTEP_ACTION } from './Actions';
+import { KEY_PRESSED_ACTION, TIMESTEP_ACTION, PLAYER_POSITION_CHANGED_ACTION } from './Actions';
 
 declare global {
     interface Window { __REDUX_DEVTOOLS_EXTENSION__: any; }
 }
 
+
+interface IPosition {
+    x: number;
+    y: number;
+}
+
 interface IGameState {
     keysPressed: string[];
+    player: {
+        position: IPosition;
+        color: string;
+    }
 }
 
 interface PayloadAction<T> extends Action<T> {
@@ -15,11 +25,18 @@ interface PayloadAction<T> extends Action<T> {
 }
 
 const initialState: IGameState = {
-    keysPressed: []
+    keysPressed: [],
+    player: {
+        position: {
+            x: 0,
+            y: 0
+        },
+        color: "red"
+    }
 }
 
 const reducer = (state: IGameState = initialState, action: PayloadAction<string>): IGameState => {
-    console.log("in reducer", action);
+    console.log("in reducer", action, state);
     switch (action.type) {
         case KEY_PRESSED_ACTION:
             const previousKeys = state.keysPressed;
@@ -34,6 +51,12 @@ const reducer = (state: IGameState = initialState, action: PayloadAction<string>
         case TIMESTEP_ACTION:
             return Object.assign({}, state, {
                 keysPressed: []
+            });
+        case PLAYER_POSITION_CHANGED_ACTION:
+            return Object.assign({}, state, {
+                player: {
+                    position: action.payload.playerPosition
+                }
             });
         default:
             return state;

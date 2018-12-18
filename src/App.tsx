@@ -6,6 +6,7 @@ import InputCapture from './ui/input_capture/InputCapture';
 import store from './store/Store';
 import { Unsubscribe } from 'redux';
 import GameController from './game/GameController';
+import Viewport from './ui/viewport/Viewport';
 
 class App extends Component {
     private unsubscribe!: Unsubscribe;
@@ -43,8 +44,8 @@ class App extends Component {
             <div className="App">
                 <button onClick={this.startGame}>Start Game</button>
                 <button onClick={this.stopGame}>Stop Game</button>
-                <LocalMap />
                 <InputCapture />
+                <Viewport />
             </div>
             </Provider>
         );
