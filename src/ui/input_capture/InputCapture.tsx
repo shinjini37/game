@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
+import { KEY_PRESSED_ACTION} from '../../store/Actions';
 
 interface IInputCaptureProperties {
     onKeyPressed: (e: KeyboardEvent) => void;
@@ -32,11 +33,10 @@ function mapStateToProps(state: any, ownProps: any) {
 function mapDispatchToProps(dispatch: Dispatch, ownProps: any) {
     return {
         onKeyPressed: (e: KeyboardEvent) => {
-            console.log("in mapDispatchToProps", e.code);
             dispatch({
-                type: "KeysPressed",
+                type: KEY_PRESSED_ACTION,
                 payload: {
-                    keys: [e.code]
+                    keyPressed: e.code
                 }
             })
         }

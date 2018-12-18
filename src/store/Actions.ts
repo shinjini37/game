@@ -1,0 +1,4 @@
+const KEY_PRESSED_ACTION = "KeyPressed";
+const TIMESTEP_ACTION = "TimeStep";
+
+export {KEY_PRESSED_ACTION, TIMESTEP_ACTION};

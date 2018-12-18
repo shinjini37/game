@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './LocalMap.css';
 import Tile from '../tile/Tile';
-import map1 from '../assets/maps/map1.json';
+import map1 from '../../assets/maps/map1.json';
 
 class LocalMap extends Component {
     render() {

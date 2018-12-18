@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import './Tile.css'
-
-const TILE_SIZE = 32;
+import { TILE_SIZE } from '../../game/GameConstants';
 
 const COLOR_MAP = new Map<number, string>([
     [0, ''],
