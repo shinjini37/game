@@ -7,13 +7,28 @@ class LocalMap extends Component {
     render() {
         return (
             <>{
-                map1.map((row, i) => (
-                    <Row key={i} tiles={row}></Row>
+                map1.map((mapLayer, i) => (
+                    <MapLayer key={i} mapLayer={mapLayer}></MapLayer>
                 ))
             }</>
         )
     }
 }
+
+interface IMapLayerProps {
+    mapLayer: number[][];
+}
+
+function MapLayer(props: IMapLayerProps) {
+    return (
+        <div className="map-layer">{
+            props.mapLayer.map((row, i) => (
+                <Row key={i} tiles={row}></Row>
+            ))
+        }</div>
+    )
+}
+
 
 interface IRowProps {
     tiles: number[];
