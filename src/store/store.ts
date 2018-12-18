@@ -1,5 +1,9 @@
 import { createStore, Action } from 'redux';
 
+declare global {
+    interface Window { __REDUX_DEVTOOLS_EXTENSION__: any; }
+}
+
 interface IGameState {
     keysPressed: string[];
 }
@@ -24,6 +28,8 @@ const reducer = (state: IGameState = initialState, action: PayloadAction<string>
     }
 }
 
-const store = createStore(reducer /*TODO , savedGameState */);
+const store = createStore(reducer,
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+     /*TODO , savedGameState */);
 
 export default store;
