@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { TILE_SIZE } from '../../game/GameConstants';
+import { connect } from 'react-redux';
 
-
-function Character(props: any) {
+const _Character = function (props: any) {
     const style = {
         height: TILE_SIZE,
         width: TILE_SIZE,
@@ -14,9 +14,11 @@ function Character(props: any) {
     )
 }
 
+const Character = connect(mapStateToProps)(_Character);
+
 function CharacterLayer(props: any) {
     return (
-        <Character position={[0,0]}></Character>
+        <Character></Character>
     )
 }
 

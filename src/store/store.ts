@@ -1,6 +1,6 @@
 import { createStore, Action } from 'redux';
 
-import { KEY_PRESSED_ACTION, TIMESTEP_ACTION, PLAYER_POSITION_CHANGED_ACTION } from './Actions';
+import { KEY_DOWN_ACTION, KEY_UP_ACTION, PLAYER_POSITION_CHANGED_ACTION } from './Actions';
 
 declare global {
     interface Window { __REDUX_DEVTOOLS_EXTENSION__: any; }
@@ -12,12 +12,16 @@ interface IPosition {
     y: number;
 }
 
+interface IKeyPressedState {
+    [index:string] : boolean;
+}
+
 interface IGameState {
-    keysPressed: string[];
+    keysPressed: IKeyPressedState;
     player: {
         position: IPosition;
         color: string;
-    }
+    };
 }
 
 interface PayloadAction<T> extends Action<T> {
@@ -25,7 +29,7 @@ interface PayloadAction<T> extends Action<T> {
 }
 
 const initialState: IGameState = {
-    keysPressed: [],
+    keysPressed: {},
     player: {
         position: {
             x: 0,
@@ -36,31 +40,42 @@ const initialState: IGameState = {
 }
 
 const reducer = (state: IGameState = initialState, action: PayloadAction<string>): IGameState => {
-    console.log("in reducer", action, state);
     switch (action.type) {
-        case KEY_PRESSED_ACTION:
-            const previousKeys = state.keysPressed;
-            const newKey = action.payload.keyPressed;
-            const newKeys = [...previousKeys];
-            if (previousKeys.indexOf(newKey) < 0) {
-                newKeys.push(newKey);
-            }
+        case KEY_DOWN_ACTION:{
+            const newKeys = handleKey(state.keysPressed, action.payload.key, false);
             return Object.assign({}, state, {
                 keysPressed: newKeys
             });
-        case TIMESTEP_ACTION:
+        }
+        case KEY_UP_ACTION:{
+            const newKeys = handleKey(state.keysPressed, action.payload.key, true);
             return Object.assign({}, state, {
-                keysPressed: []
+                keysPressed: newKeys
             });
+        }
         case PLAYER_POSITION_CHANGED_ACTION:
+            const newPlayer = Object.assign({}, state.player, {
+                position: action.payload.playerPosition
+            })
             return Object.assign({}, state, {
-                player: {
-                    position: action.payload.playerPosition
-                }
+                player: newPlayer
             });
         default:
             return state;
     }
+}
+
+function handleKey(previousKeys: IKeyPressedState, newKey: string, removing: boolean) {
+    const newKeys = {...previousKeys};
+    if (removing) {
+        if (newKeys.hasOwnProperty(newKey)) {
+            delete newKeys[newKey];
+        }
+    } else {
+        newKeys[newKey] = true;
+    }
+    
+    return newKeys;
 }
 
 const store = createStore(reducer,

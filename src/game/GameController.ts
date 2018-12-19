@@ -1,5 +1,4 @@
 import store from '../store/Store';
-import { TIMESTEP_ACTION } from '../store/Actions';
 import Game from './Game';
 
 class GameController {
@@ -15,10 +14,9 @@ class GameController {
     }
 
     timestep() {
-        const keys = store.getState().keysPressed;
+        const keys = Object.keys(store.getState().keysPressed);
         
         this.game.timestep(keys);
-        dispatchTimestep();
     }
 
     start() {
@@ -27,7 +25,7 @@ class GameController {
             return; 
         }
         this.timestep() 
-        this.gameTimestep = setInterval(this.timestep, 2000);
+        this.gameTimestep = setInterval(this.timestep, 50);
     }
 
     stop() {
@@ -36,14 +34,6 @@ class GameController {
             this.gameTimestep = undefined;
         }
     }
-}
-
-
-
-function dispatchTimestep() {
-    store.dispatch({
-        type: TIMESTEP_ACTION
-    });
 }
 
 export default GameController;

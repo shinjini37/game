@@ -1,4 +1,4 @@
-import { TILE_SIZE, UP, DOWN, LEFT, RIGHT } from "./GameConstants";
+import { TILE_SIZE, UP, DOWN, LEFT, RIGHT, PLAYER_SPEED } from "./GameConstants";
 import store from '../store/Store';
 import { PLAYER_POSITION_CHANGED_ACTION } from "../store/Actions";
 
@@ -9,24 +9,23 @@ class Game {
 
     timestep(inputs: string[]) {
         const playerPosition = store.getState().player.position;
-        console.log("in game timestep", playerPosition);
         let positionChanged = false;
         inputs.forEach(key => {
             switch(key) {
                 case UP:
-                    playerPosition.y -= TILE_SIZE;
+                    playerPosition.y -= PLAYER_SPEED;
                     positionChanged = true;
                     break;
                 case DOWN:
-                    playerPosition.y += TILE_SIZE;
+                    playerPosition.y += PLAYER_SPEED;
                     positionChanged = true;
                     break;
                 case LEFT:
-                    playerPosition.x += TILE_SIZE;
+                    playerPosition.x -= PLAYER_SPEED;
                     positionChanged = true;
                     break;
                 case RIGHT:
-                    playerPosition.x -= TILE_SIZE;
+                    playerPosition.x += PLAYER_SPEED;
                     positionChanged = true;
                     break;
             }
