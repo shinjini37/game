@@ -2,6 +2,10 @@ import { TILE_SIZE, UP, DOWN, LEFT, RIGHT, PLAYER_SPEED } from "./GameConstants"
 import store from '../store/Store';
 import { PLAYER_POSITION_CHANGED_ACTION } from "../store/Actions";
 
+function getNormalizedSpeed(speed: number, magnitude: number): number {
+    return (speed/Math.sqrt(magnitude))*PLAYER_SPEED
+}
+
 
 class Game {
     constructor(levelmap: number[][]) {
@@ -9,29 +13,30 @@ class Game {
 
     timestep(inputs: string[]) {
         const playerPosition = store.getState().player.position;
-        let positionChanged = false;
+        const positionVector = [0, 0]; // x, y
         inputs.forEach(key => {
             switch(key) {
                 case UP:
-                    playerPosition.y -= PLAYER_SPEED;
-                    positionChanged = true;
+                    positionVector[1] -= 1;
                     break;
                 case DOWN:
-                    playerPosition.y += PLAYER_SPEED;
-                    positionChanged = true;
+                    positionVector[1] += 1;
                     break;
                 case LEFT:
-                    playerPosition.x -= PLAYER_SPEED;
-                    positionChanged = true;
+                    positionVector[0] -= 1;
                     break;
                 case RIGHT:
-                    playerPosition.x += PLAYER_SPEED;
-                    positionChanged = true;
+                    positionVector[0] += 1;
                     break;
             }
         });
 
-        if (positionChanged) {
+        const positionChangeMagnitude = Math.abs(positionVector[0]) + Math.abs(positionVector[1]);
+
+        if (positionChangeMagnitude > 0) {
+            playerPosition.x += getNormalizedSpeed(positionVector[0], positionChangeMagnitude);
+            playerPosition.y += getNormalizedSpeed(positionVector[1], positionChangeMagnitude);
+
             store.dispatch({
                 type: PLAYER_POSITION_CHANGED_ACTION,
                 payload: {
