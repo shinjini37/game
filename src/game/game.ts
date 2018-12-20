@@ -1,5 +1,5 @@
-import { TILE_SIZE, UP, DOWN, LEFT, RIGHT, PLAYER_SPEED } from "./GameConstants";
-import store from '../store/Store';
+import { UP, DOWN, LEFT, RIGHT, PLAYER_SPEED, SCREEN_HEIGHT, SCREEN_WIDTH, TILE_SIZE } from "./GameConstants";
+import store, { IPosition, IDimensions } from '../store/Store';
 import { PLAYER_POSITION_CHANGED_ACTION } from "../store/Actions";
 
 function getNormalizedSpeed(speed: number, magnitude: number): number {
@@ -36,6 +36,10 @@ class Game {
         if (positionChangeMagnitude > 0) {
             playerPosition.x += getNormalizedSpeed(positionVector[0], positionChangeMagnitude);
             playerPosition.y += getNormalizedSpeed(positionVector[1], positionChangeMagnitude);
+
+
+            const visible = findVisibleRange(playerPosition, {width: 25*TILE_SIZE, height: 12*TILE_SIZE});
+            console.log(visible[0], visible[1]);
 
             store.dispatch({
                 type: PLAYER_POSITION_CHANGED_ACTION,
@@ -105,5 +109,40 @@ class Water extends Sprite {
         
     }
 }
+
+function findVisibleRange(playerPosition: IPosition, mapDimensions: IDimensions) {
+    // We will assume that the map is always bigger than the viewport
+    const halfWidth = Math.floor(SCREEN_WIDTH/2); // let's keep everything as integers
+    const halfHeight = Math.floor(SCREEN_HEIGHT/2); // and assume the width and height are even numbers
+
+    let startx, starty, endx, endy;
+
+    startx = playerPosition.x - halfWidth;
+    endx = playerPosition.x + halfWidth;
+    starty = playerPosition.y - halfHeight;
+    endy = playerPosition.y + halfHeight;
+
+    if (playerPosition.x < halfWidth) {
+        startx = 0;
+        endx = SCREEN_WIDTH;
+    }
+    if (playerPosition.x > (mapDimensions.width - halfWidth)) {
+        endx = mapDimensions.width;
+        startx = mapDimensions.width - SCREEN_WIDTH;
+    }
+
+    if (playerPosition.y < halfHeight) {
+        starty = 0;
+        endy = SCREEN_HEIGHT;
+    }
+    if (playerPosition.y > (mapDimensions.height - halfHeight)) {
+        endy = mapDimensions.height;
+        starty = mapDimensions.height - SCREEN_HEIGHT; 
+    }
+
+    return [[startx, starty], [endx, endy]]
+}
+
+
 
 export default Game

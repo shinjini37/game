@@ -1,7 +1,7 @@
 
 const TILE_SIZE = 32;
-const SCREEN_WIDTH = 400;
-const SCREEN_HEIGHT = 200;
+const SCREEN_WIDTH = 320;
+const SCREEN_HEIGHT = 320;
 
 const PLAYER_SPEED = Math.floor(TILE_SIZE/4);
 

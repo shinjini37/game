@@ -1,3 +1,5 @@
 .viewport {
     position: relative;
+    overflow: hidden;
+    margin: 20px auto;
 }

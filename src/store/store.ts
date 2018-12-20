@@ -7,9 +7,14 @@ declare global {
 }
 
 
-interface IPosition {
+export interface IPosition {
     x: number;
     y: number;
+}
+
+export interface IDimensions {
+    width: number;
+    height: number;
 }
 
 interface IKeyPressedState {
