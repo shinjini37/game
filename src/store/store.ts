@@ -1,6 +1,6 @@
 import { createStore, Action } from 'redux';
 
-import * as dotProp from './dot-prop-immutable-copy';
+import * as dotProp from './dot-prop-immutable-reexport';
 
 import { KEY_DOWN_ACTION, KEY_UP_ACTION, PLAYER_POSITION_CHANGED_ACTION } from './Actions';
 
