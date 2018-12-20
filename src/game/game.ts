@@ -6,12 +6,24 @@ function getNormalizedSpeed(speed: number, magnitude: number): number {
     return (speed/Math.sqrt(magnitude))*PLAYER_SPEED
 }
 
+type MapLayer = number[][];
+interface ILevelMapDict {
+    [index: string]: number; // "(x,y)" => item number???
+}
+
+
 
 class Game {
-    constructor(levelmap: number[][]) {
+    static digestMap(levelmap: MapLayer[]) {
+        const levelMapDict = {};
     }
 
     timestep(inputs: string[]) {
+        const type = 'player';
+        console.log(TYPESTRING_TO_TYPE['player'].doThing(),
+        TYPESTRING_TO_TYPE['ground'].doThing(),
+        TYPESTRING_TO_TYPE[type].doThing())
+
         const playerPosition = store.getState().player.position;
         const positionVector = [0, 0]; // x, y
         inputs.forEach(key => {
@@ -66,6 +78,10 @@ class Sprite {
     render() {
         
     }
+
+    static doThing() {
+        return "Sprite";
+    }
 }
 
 class Player extends Sprite {
@@ -80,6 +96,10 @@ class Player extends Sprite {
     render() {
         
     }
+
+    static doThing() {
+        return "Player";
+    }
 }
 
 class Ground extends Sprite {
@@ -93,6 +113,10 @@ class Ground extends Sprite {
 
     render() {
         
+    }
+
+    static doThing() {
+        return "Ground";
     }
 }
 
@@ -143,6 +167,10 @@ function findVisibleRange(playerPosition: IPosition, mapDimensions: IDimensions)
     return [[startx, starty], [endx, endy]]
 }
 
-
+const TYPESTRING_TO_TYPE: {[index: string]: typeof Sprite}
+ = {
+    "player": Player,
+    "ground": Ground
+}
 
 export default Game

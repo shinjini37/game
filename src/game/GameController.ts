@@ -6,7 +6,7 @@ class GameController {
     private game: Game;
 
     constructor() {
-        this.game = new Game([]); // TODO levelmap
+        this.game = new Game(); // TODO levelmap
 
         this.timestep = this.timestep.bind(this);
         this.stop = this.stop.bind(this);
