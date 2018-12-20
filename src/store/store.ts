@@ -1,5 +1,7 @@
 import { createStore, Action } from 'redux';
 
+import * as dotProp from './dot-prop-immutable-copy';
+
 import { KEY_DOWN_ACTION, KEY_UP_ACTION, PLAYER_POSITION_CHANGED_ACTION } from './Actions';
 
 declare global {
@@ -48,23 +50,14 @@ const reducer = (state: IGameState = initialState, action: PayloadAction<string>
     switch (action.type) {
         case KEY_DOWN_ACTION:{
             const newKeys = handleKey(state.keysPressed, action.payload.key, false);
-            return Object.assign({}, state, {
-                keysPressed: newKeys
-            });
+            return dotProp.set(state, 'keysPressed', newKeys);
         }
         case KEY_UP_ACTION:{
             const newKeys = handleKey(state.keysPressed, action.payload.key, true);
-            return Object.assign({}, state, {
-                keysPressed: newKeys
-            });
+            return dotProp.set(state, 'keysPressed', newKeys);
         }
         case PLAYER_POSITION_CHANGED_ACTION:
-            const newPlayer = Object.assign({}, state.player, {
-                position: action.payload.playerPosition
-            })
-            return Object.assign({}, state, {
-                player: newPlayer
-            });
+            return dotProp.set(state, 'player.position', action.payload.playerPosition);
         default:
             return state;
     }
