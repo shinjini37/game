@@ -1,5 +1,5 @@
 import { UP, DOWN, LEFT, RIGHT, PLAYER_SPEED, SCREEN_HEIGHT, SCREEN_WIDTH, TILE_SIZE } from "./GameConstants";
-import store, { IPosition, IDimensions } from '../store/Store';
+import store, { IPosition, IDimensions, getPlayer } from '../store/Store';
 import { PLAYER_POSITION_CHANGED_ACTION } from "../store/Actions";
 
 function getNormalizedSpeed(speed: number, magnitude: number): number {
@@ -24,7 +24,7 @@ class Game {
         TYPESTRING_TO_TYPE['ground'].doThing(),
         TYPESTRING_TO_TYPE[type].doThing())
 
-        const playerPosition = store.getState().player.position;
+        const playerPosition = getPlayer(store.getState()).properties.position;
         const positionVector = [0, 0]; // x, y
         inputs.forEach(key => {
             switch(key) {

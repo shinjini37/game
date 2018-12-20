@@ -1,5 +1,6 @@
 import store from '../store/Store';
 import Game from './Game';
+import { TIMESTEP_DURATION } from './GameConstants';
 
 class GameController {
     private gameTimestep: NodeJS.Timeout | undefined;
@@ -25,7 +26,7 @@ class GameController {
             return; 
         }
         this.timestep() 
-        this.gameTimestep = setInterval(this.timestep, 50);
+        this.gameTimestep = setInterval(this.timestep, TIMESTEP_DURATION);
     }
 
     stop() {

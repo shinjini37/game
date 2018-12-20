@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { TILE_SIZE } from '../../game/GameConstants';
 import { connect } from 'react-redux';
+import { IGameState, getPlayer } from '../../store/Store';
 
 const _Character = function (props: any) {
     const style = {
@@ -22,9 +23,9 @@ function CharacterLayer(props: any) {
     )
 }
 
-function mapStateToProps(state: any) {
+function mapStateToProps(state: IGameState) {
     return {
-        position: state.player.position
+        position: getPlayer(state).properties.position
     };
 }
 
