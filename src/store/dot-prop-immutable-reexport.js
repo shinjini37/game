@@ -1,5 +1,10 @@
 import dotProp from 'dot-prop-immutable';
 
+// dot-prop-immutable only creates new objects in the 
+// path of the property (so checking the object address will indicate 
+// something has changed along the line). Objects in the other paths
+// are still the same (they point to the same address).
+
 function set(obj, prop, value) {
 	return dotProp.set(obj, prop, value);
 }

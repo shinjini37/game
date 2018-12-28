@@ -92,7 +92,7 @@ const initialState: IGameState = {
                     x: 0,
                     y: 0
                 },
-                color: "red"
+                color: {value:"red"}
             }
         }
     }

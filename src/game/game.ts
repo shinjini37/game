@@ -12,7 +12,8 @@ import store, { IPosition, IDimensions, getPlayer, getTileId, IMap, ITile} from 
 import { PLAYER_POSITION_CHANGED_ACTION } from "../store/Actions";
 
 function getNormalizedSpeed(speed: number, magnitude: number): number {
-    return (speed/Math.sqrt(magnitude))*PLAYER_SPEED
+    // one pixel accuracy is acceptable
+    return Math.floor((speed/Math.sqrt(magnitude))*PLAYER_SPEED);
 }
 
 type MapLayer = number[][];

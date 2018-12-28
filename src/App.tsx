@@ -30,7 +30,7 @@ class App extends Component {
 
     componentDidMount() {
         this.unsubscribe = store.subscribe(() => {
-            console.log(store.getState());
+            // console.log(store.getState());
         });
     }
 

@@ -3,7 +3,7 @@ const TILE_SIZE = 32;
 const SCREEN_WIDTH = 320;
 const SCREEN_HEIGHT = 320;
 
-const PLAYER_SPEED = Math.floor(TILE_SIZE / 4);
+const PLAYER_SPEED = Math.floor(TILE_SIZE / 2);
 
 const UP = "ArrowUp";
 const DOWN = "ArrowDown";
