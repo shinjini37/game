@@ -6,9 +6,8 @@ import {
     PLAYER_SPEED, 
     SCREEN_HEIGHT, 
     SCREEN_WIDTH, 
-    TILE_SIZE, 
-    IGNORE_TILE } from "./GameConstants";
-import store, { IPosition, IDimensions, getPlayer, getTileId, IMap, ITile} from '../store/Store';
+    TILE_SIZE } from "./GameConstants";
+import store, { IPosition, IDimensions, getPlayer, ObjectType } from '../store/Store';
 import { PLAYER_POSITION_CHANGED_ACTION } from "../store/Actions";
 
 function getNormalizedSpeed(speed: number, magnitude: number): number {
@@ -16,56 +15,7 @@ function getNormalizedSpeed(speed: number, magnitude: number): number {
     return Math.floor((speed/Math.sqrt(magnitude))*PLAYER_SPEED);
 }
 
-type MapLayer = number[][];
-
-const TYPE_MAP: {[index: number]: string} = {
-    1: "grass",
-    2: "rock",
-    10: "water",
-    20: "mountain"
-};
-
-const COLOR_MAP: {[index: number]: string} = {
-    1: '#a36e28',
-    2: '#a69162',
-    10: '#4d9bbd',
-    20: '#703227',
-};
-
-
 class Game {
-    static digestMap(mapname: string, levelmap: MapLayer[]): IMap {
-        const levelMapDict: ITile = {};
-        const numLevels = levelmap.length;
-        const numRows = levelmap[0].length;
-        const numCols = levelmap[0][0].length;
-        levelmap.forEach((mapLayer: MapLayer, level: number) => {
-            mapLayer.forEach((mapRow: number[], row: number) => {
-                mapRow.forEach((mapTileNumber: number, col: number) => {
-                    if (mapTileNumber != IGNORE_TILE) {
-                        const name = getTileId(mapname, level, row, col);
-                        levelMapDict[name] = {
-                            id: name,
-                            properties: {
-                                type: TYPE_MAP[mapTileNumber],
-                                type_number: mapTileNumber,
-                                color: COLOR_MAP[mapTileNumber]
-                            }
-                        }; 
-                    }
-                });
-            });
-        });
-
-        const dimensions = {
-            numLevels,
-            numRows,
-            numCols
-        }
-        const objects = levelMapDict;
-        return {id: mapname, dimensions, objects};
-    }
-
     static timestep(inputs: string[]) {
         const playerPosition = getPlayer(store.getState()).properties.position;
         const positionVector = [0, 0]; // x, y
@@ -85,6 +35,11 @@ class Game {
                     break;
             }
         });
+
+        console.log(Rectangle.translationVector(
+            Rectangle.getRectangle(playerPosition),
+            Rectangle.getRectangle({x: TILE_SIZE, y: TILE_SIZE}))
+        );
 
         const positionChangeMagnitude = Math.abs(positionVector[0]) + Math.abs(positionVector[1]);
 
@@ -107,6 +62,92 @@ class Game {
 
     render() {
 
+    }
+}
+
+interface IRectangle {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+}
+
+class Rectangle {
+    // """A rectangle object to help with collision detection and resolution."""
+
+    static getRectangle(position: IPosition): IRectangle {
+        return {
+            x: position.x,
+            y: position.y,
+            h: TILE_SIZE,
+            w: TILE_SIZE
+        }
+    }
+
+    static rightOverlap(r1: IRectangle, r2: IRectangle) {
+        return r1.x <= r2.x && r2.x < (r1.x + r1.w);
+    }
+
+    static upOverlap(r1: IRectangle, r2: IRectangle){
+        return r1.y <= r2.y && r2.y < (r1.y + r1.h);
+    }
+
+    static intersects(r1: IRectangle, r2: IRectangle){
+        // """Check whether `r1` and `r2` overlap.
+        // Rectangles are open on the top and right sides, and closed on
+        // the bottom and left sides; concretely, this means that the
+        // rectangle [0, 0, 1, 1] does not intersect either of [0, 1, 1, 1]
+        // or [1, 0, 1, 1].
+        // """
+        const xOverlap = Rectangle.rightOverlap(r1, r2) || Rectangle.rightOverlap(r2, r1);
+        const yOverlap = Rectangle.upOverlap(r1, r2) || Rectangle.upOverlap(r2, r1);
+        return xOverlap && yOverlap;
+    }
+
+    static translationVector(r1: IRectangle, r2: IRectangle){
+        // """Compute how much `r1` needs to move to stop intersecting `r2`.
+        // If `r1` does not intersect `r2`, return ``[0, 0]``.  Otherwise,
+        // return a minimal pair ``[x, y]`` such that translating `r1` by
+        // ``[x, y]`` would suppress the overlap. ``[x, y]`` is minimal in
+        // the sense of the "L1" distance; in other words, the sum of
+        // ``abs(x)`` and ``abs(y)`` should be as small as possible.
+        // When two pairs ``[x, y]`` and ``[y, x]`` are tied, return the
+        // one with the smallest element first.
+        // """
+        if (!Rectangle.intersects(r1, r2)){
+            return [0, 0];
+        }
+        // Moving in just one direction should be enough to deal with
+        // the overlap
+
+        // r1 move horizontally, left or right
+        const moveLeftX = - ((r1.x + r1.w) - r2.x); // moving left is a -ve motion
+        const moveRightX = (r2.x + r2.w) - r1.x;
+
+        // r1 move vertically, top or bottom
+        const moveBottomY = -((r2.y + r2.h) - r1.y); // moving bottom is a -ve motion
+        const moveTopY = (r1.y + r1.h) - r2.y;
+        
+        let res = [moveLeftX, moveBottomY];
+        [moveLeftX, 0, moveRightX].forEach(x => {
+            [moveBottomY, 0, moveTopY].forEach(y => {
+                if (x == 0 && y == 0){
+                    return;
+                }
+                const newL1 = (Math.abs(x) + Math.abs(y))
+                const currentL1 = (Math.abs(res[0]) + Math.abs(res[1]))
+                if (newL1 > currentL1){
+                    return;
+                }
+                if (newL1 == currentL1) {
+                    if (Math.abs(x) > Math.abs(res[0])){
+                        return;
+                    }
+                }
+                res = [x, y];
+            });
+        });
+        return res;
     }
 }
 
@@ -145,7 +186,13 @@ class Player extends Sprite {
     }
 }
 
-class Ground extends Sprite {
+class Collidable {
+    static collide(other: Collidable) {
+        return ;
+    }
+}
+
+class Grass extends Sprite {
     constructor() {
         super();
     }
@@ -164,6 +211,34 @@ class Ground extends Sprite {
 }
 
 class Water extends Sprite {
+    constructor() {
+        super();
+    }
+
+    timestep(inputs: string[]) {
+
+    }
+
+    render() {
+        
+    }
+}
+
+class Mountain extends Sprite {
+    constructor() {
+        super();
+    }
+
+    timestep(inputs: string[]) {
+
+    }
+
+    render() {
+        
+    }
+}
+
+class Rock extends Sprite {
     constructor() {
         super();
     }
@@ -218,10 +293,13 @@ function findVisibleRange(playerPosition: IPosition, mapDimensions: IDimensions)
     }
 }
 
-const TYPESTRING_TO_TYPE: {[index: string]: typeof Sprite}
+const TO_TYPE_OBJECT: {[index: number]: typeof Sprite}
  = {
-    "player": Player,
-    "ground": Ground
+    [ObjectType.Player]: Player,
+    [ObjectType.Grass]: Grass,
+    [ObjectType.Water]: Water,
+    [ObjectType.Mountain]: Mountain,
+    [ObjectType.Rock]: Rock
 }
 
 export default Game;
