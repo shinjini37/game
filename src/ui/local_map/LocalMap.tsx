@@ -3,7 +3,7 @@ import './LocalMap.css';
 import Tile from '../tile/Tile';
 import CharacterLayer from './CharacterLayer';
 
-import store, { getTileId } from '../../store/Store';
+import store, { getTileId, maps} from '../../store/Store';
 import { IGNORE_TILE } from '../../game/GameConstants';
 
 const range = (upper: number) => {
@@ -12,7 +12,7 @@ const range = (upper: number) => {
 
 class LocalMap extends Component {
     render() {
-        const map = store.getState().maps["map1"];
+        const map = maps["map1"];
         const dimensions = map.dimensions;
         return (
             <>
@@ -30,7 +30,7 @@ interface IMapLayerProps {
 }
 
 function MapLayer(props: IMapLayerProps) {
-    const map = store.getState().maps["map1"];
+    const map = maps["map1"];
     const dimensions = map.dimensions;
     return (
         <div className="map-layer">
@@ -48,10 +48,10 @@ interface IRowProps {
 }
 
 function Row(props: IRowProps) {
-    const map = store.getState().maps["map1"];
+    const map = maps["map1"];
     const dimensions = map.dimensions;
 
-    const objects = store.getState().objects;
+    const objects = map.objects;
     return (
         <div className="row">
             {range(dimensions.numCols).map((_, i) => {

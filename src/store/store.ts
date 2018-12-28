@@ -26,20 +26,30 @@ interface IKeyPressedState {
     [index: string]: boolean;
 }
 
+export interface ITile {
+    [index: string]: {
+        id: string;
+        properties: {
+            type: string,
+            type_number: number,
+            color: string
+        }
+    }
+}
+
+export interface IMap {
+    id: string;
+    objects: ITile;
+    dimensions: {
+        numLevels: number,
+        numRows: number,
+        numCols: number
+    }
+}
+
 export interface IGameState {
     keysPressed: IKeyPressedState;
     playerId: string;
-    maps: {
-        [index: string]: { // mapid => list of objectids
-            id: string;
-            objects: string[];
-            dimensions: {
-                numLevels: number,
-                numRows: number,
-                numCols: number
-            }
-        }
-    }
     objects: {
         [index: string]: { // objectId => any properties
             id: string;
@@ -62,7 +72,6 @@ const PLAYER_ID = "player";
 const initialState: IGameState = {
     keysPressed: {},
     playerId: PLAYER_ID,
-    maps: {},
     objects: {
         [PLAYER_ID]: {
             id: PLAYER_ID,
@@ -77,22 +86,25 @@ const initialState: IGameState = {
     }
 };
 
-(() => {
-    const {dimensions, objects} = Game.digestMap(map1);
-    const mapName = "map1";
-    initialState.maps[mapName] = {
-        id: mapName,
-        dimensions: dimensions,
-        objects: []
-    };
+// (() => {
+//     const {dimensions, objects} = Game.digestMap(map1);
+//     const mapName = "map1";
+//     initialState.maps[mapName] = {
+//         id: mapName,
+//         dimensions: dimensions,
+//         objects: []
+//     };
 
-    Object.keys(objects).forEach((id: string) => {
-        initialState.maps[mapName].objects.push(id);
-        initialState.objects[id] = objects[id];
-    });
+//     Object.keys(objects).forEach((id: string) => {
+//         initialState.maps[mapName].objects.push(id);
+//         initialState.objects[id] = objects[id];
+//     });
 
-})();
+// })();
 
+export const maps: {[index: string]: IMap} = {
+    "map1": Game.digestMap("map1", map1)
+};
 
 export function getTileId(mapName:string, level:number, row:number, col:number) {
     return  `${mapName}(${level}, ${row}, ${col})`;

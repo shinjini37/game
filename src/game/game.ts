@@ -8,7 +8,7 @@ import {
     SCREEN_WIDTH, 
     TILE_SIZE, 
     IGNORE_TILE } from "./GameConstants";
-import store, { IPosition, IDimensions, getPlayer, getTileId} from '../store/Store';
+import store, { IPosition, IDimensions, getPlayer, getTileId, IMap, ITile} from '../store/Store';
 import { PLAYER_POSITION_CHANGED_ACTION } from "../store/Actions";
 
 function getNormalizedSpeed(speed: number, magnitude: number): number {
@@ -16,14 +16,6 @@ function getNormalizedSpeed(speed: number, magnitude: number): number {
 }
 
 type MapLayer = number[][];
-interface ILevelMapDict {
-    [index: string]: IMapTileObject; // "mapname(level, x, y)" => MapTileObject
-}
-
-interface IMapTileObject {
-    id: string;
-    properties: any;
-}
 
 const TYPE_MAP: {[index: number]: string} = {
     1: "grass",
@@ -41,8 +33,8 @@ const COLOR_MAP: {[index: number]: string} = {
 
 
 class Game {
-    static digestMap(levelmap: MapLayer[]) {
-        const levelMapDict: ILevelMapDict = {};
+    static digestMap(mapname: string, levelmap: MapLayer[]): IMap {
+        const levelMapDict: ITile = {};
         const numLevels = levelmap.length;
         const numRows = levelmap[0].length;
         const numCols = levelmap[0][0].length;
@@ -50,7 +42,7 @@ class Game {
             mapLayer.forEach((mapRow: number[], row: number) => {
                 mapRow.forEach((mapTileNumber: number, col: number) => {
                     if (mapTileNumber != IGNORE_TILE) {
-                        const name = getTileId("map1", level, row, col);
+                        const name = getTileId(mapname, level, row, col);
                         levelMapDict[name] = {
                             id: name,
                             properties: {
@@ -69,9 +61,8 @@ class Game {
             numRows,
             numCols
         }
-
         const objects = levelMapDict;
-        return {dimensions, objects};
+        return {id: mapname, dimensions, objects};
     }
 
     timestep(inputs: string[]) {
