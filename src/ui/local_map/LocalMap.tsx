@@ -1,18 +1,24 @@
 import React, { Component } from 'react';
 import './LocalMap.css';
 import Tile from '../tile/Tile';
-import map1 from '../../assets/maps/map1.json';
 import CharacterLayer from './CharacterLayer';
+
+import store, { getTileId } from '../../store/Store';
+import { IGNORE_TILE } from '../../game/GameConstants';
+
+const range = (upper: number) => {
+    return Array.from(new Array(upper), (x, i) => x)
+}
 
 class LocalMap extends Component {
     render() {
+        const map = store.getState().maps["map1"];
+        const dimensions = map.dimensions;
         return (
             <>
-                {
-                    map1.map((mapLayer, i) => (
-                        <MapLayer key={i} mapLayer={mapLayer}></MapLayer>
-                    ))
-                }
+                {range(dimensions.numLevels).map((_, i) => (
+                    <MapLayer key={i} layer={i}></MapLayer>
+                ))}
                 <CharacterLayer />
             </>
         )
@@ -20,31 +26,43 @@ class LocalMap extends Component {
 }
 
 interface IMapLayerProps {
-    mapLayer: number[][];
+    layer: number;
 }
 
 function MapLayer(props: IMapLayerProps) {
+    const map = store.getState().maps["map1"];
+    const dimensions = map.dimensions;
     return (
-        <div className="map-layer">{
-            props.mapLayer.map((row, i) => (
-                <Row key={i} tiles={row}></Row>
-            ))
-        }</div>
+        <div className="map-layer">
+            {range(dimensions.numRows).map((_, i) => (
+                <Row key={i} layer={props.layer} row={i}></Row>
+            ))}
+        </div>
     )
 }
 
 
 interface IRowProps {
-    tiles: number[];
+    row: number;
+    layer: number;
 }
 
 function Row(props: IRowProps) {
+    const map = store.getState().maps["map1"];
+    const dimensions = map.dimensions;
+
+    const objects = store.getState().objects;
     return (
-        <div className="row">{
-            props.tiles.map((tileColor, i) => (
-                <Tile key={i} colorNumber={tileColor}></Tile>
-            ))
-        }</div>
+        <div className="row">
+            {range(dimensions.numCols).map((_, i) => {
+                const tileId = getTileId("map1", props.layer, props.row, i);
+                const properties = (objects[tileId] || {}).properties || {};
+                return (
+                    <Tile key={i}
+                        colorNumber={properties.type_number || IGNORE_TILE}
+                        color={properties.color}></Tile>);
+            })}
+        </div>
     )
 }
 

@@ -1,17 +1,12 @@
 import React, { Component } from 'react'
 import './Tile.css'
-import { TILE_SIZE } from '../../game/GameConstants';
+import { TILE_SIZE, IGNORE_TILE } from '../../game/GameConstants';
 
-const COLOR_MAP = new Map<number, string>([
-    [0, ''],
-    [1, '#a36e28'],
-    [2, '#a69162'],
-    [10, '#4d9bbd'],
-    [20, '#703227'],
-])
+
 
 interface ITileProps {
     colorNumber: number;
+    color: string;
 }
 
 function Tile (props: ITileProps) {
@@ -21,12 +16,12 @@ function Tile (props: ITileProps) {
         width: TILE_SIZE,
     }
     
-    if (colorNumber == 0) {
+    if (colorNumber == IGNORE_TILE) {
         return (
             <div className="tile empty" style={style}></div>
         )    
     } 
-    style.backgroundColor = COLOR_MAP.get(props.colorNumber);
+    style.backgroundColor = props.color;
     return (
         <div className="tile" style={style}></div>
     )

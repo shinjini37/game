@@ -3,6 +3,9 @@ import { createStore, Action } from 'redux';
 import * as dotProp from './dot-prop-immutable-reexport';
 
 import { KEY_DOWN_ACTION, KEY_UP_ACTION, PLAYER_POSITION_CHANGED_ACTION } from './Actions';
+import Game from '../game/Game';
+
+import map1 from '../assets/maps/map1.json';
 
 declare global {
     interface Window { __REDUX_DEVTOOLS_EXTENSION__: any; }
@@ -29,7 +32,12 @@ export interface IGameState {
     maps: {
         [index: string]: { // mapid => list of objectids
             id: string;
-            objects: string[]
+            objects: string[];
+            dimensions: {
+                numLevels: number,
+                numRows: number,
+                numCols: number
+            }
         }
     }
     objects: {
@@ -67,6 +75,27 @@ const initialState: IGameState = {
             }
         }
     }
+};
+
+(() => {
+    const {dimensions, objects} = Game.digestMap(map1);
+    const mapName = "map1";
+    initialState.maps[mapName] = {
+        id: mapName,
+        dimensions: dimensions,
+        objects: []
+    };
+
+    Object.keys(objects).forEach((id: string) => {
+        initialState.maps[mapName].objects.push(id);
+        initialState.objects[id] = objects[id];
+    });
+
+})();
+
+
+export function getTileId(mapName:string, level:number, row:number, col:number) {
+    return  `${mapName}(${level}, ${row}, ${col})`;
 }
 
 const reducer = (state: IGameState = initialState, action: PayloadAction<string>): IGameState => {

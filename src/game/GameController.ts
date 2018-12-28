@@ -2,13 +2,14 @@ import store from '../store/Store';
 import Game from './Game';
 import { TIMESTEP_DURATION } from './GameConstants';
 
+
 class GameController {
     private gameTimestep: NodeJS.Timeout | undefined;
     private game: Game;
 
     constructor() {
         this.game = new Game(); // TODO levelmap
-
+        
         this.timestep = this.timestep.bind(this);
         this.stop = this.stop.bind(this);
         this.start = this.start.bind(this);
@@ -25,7 +26,7 @@ class GameController {
             // already started
             return; 
         }
-        this.timestep() 
+        this.timestep();
         this.gameTimestep = setInterval(this.timestep, TIMESTEP_DURATION);
     }
 
