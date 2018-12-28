@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import { TILE_SIZE } from '../../game/GameConstants';
 import { connect } from 'react-redux';
-import { IGameState, getPlayer } from '../../store/Store';
+import store, { IGameState, getPlayer } from '../../store/Store';
 
 const _Character = function (props: any) {
     const style = {
         height: TILE_SIZE,
         width: TILE_SIZE,
-        top: props.position.y,
-        left: props.position.x
+        top: props.position.y - props.visible.start.y,
+        left: props.position.x - props.visible.start.x
     }
     return (
         <div style={style} className="character" ></div>
@@ -25,7 +25,8 @@ function CharacterLayer(props: any) {
 
 function mapStateToProps(state: IGameState) {
     return {
-        position: getPlayer(state).properties.position
+        position: getPlayer(state).properties.position,
+        visible: state.visible
     };
 }
 

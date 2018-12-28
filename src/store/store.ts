@@ -6,6 +6,7 @@ import { KEY_DOWN_ACTION, KEY_UP_ACTION, PLAYER_POSITION_CHANGED_ACTION } from '
 import Game from '../game/Game';
 
 import map1 from '../assets/maps/map1.json';
+import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../game/GameConstants';
 
 declare global {
     interface Window { __REDUX_DEVTOOLS_EXTENSION__: any; }
@@ -50,6 +51,7 @@ export interface IMap {
 export interface IGameState {
     keysPressed: IKeyPressedState;
     playerId: string;
+    visible: any;
     objects: {
         [index: string]: { // objectId => any properties
             id: string;
@@ -72,6 +74,16 @@ const PLAYER_ID = "player";
 const initialState: IGameState = {
     keysPressed: {},
     playerId: PLAYER_ID,
+    visible: {
+        start: {
+            x: 0,
+            y: 0
+        },
+        end: {
+            x: SCREEN_WIDTH,
+            y: SCREEN_HEIGHT
+        }
+    },
     objects: {
         [PLAYER_ID]: {
             id: PLAYER_ID,
@@ -121,11 +133,17 @@ const reducer = (state: IGameState = initialState, action: PayloadAction<string>
             return dotProp.set(state, 'keysPressed', newKeys);
         }
         case PLAYER_POSITION_CHANGED_ACTION:
-            return dotProp.set(
+            const newState1 = dotProp.set(
                 state,
                 `objects.${PLAYER_ID}.properties.position`,
                 action.payload.playerPosition
             );
+            const newState2 = dotProp.set(
+                newState1,
+                `visible`,
+                action.payload.visible
+            );
+            return newState2;
         default:
             return state;
     }

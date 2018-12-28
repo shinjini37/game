@@ -65,7 +65,7 @@ class Game {
         return {id: mapname, dimensions, objects};
     }
 
-    timestep(inputs: string[]) {
+    static timestep(inputs: string[]) {
         const playerPosition = getPlayer(store.getState()).properties.position;
         const positionVector = [0, 0]; // x, y
         inputs.forEach(key => {
@@ -97,7 +97,8 @@ class Game {
             store.dispatch({
                 type: PLAYER_POSITION_CHANGED_ACTION,
                 payload: {
-                    playerPosition: {...playerPosition}
+                    playerPosition: {...playerPosition},
+                    visible: {...visible}
                 }
             });
         }
@@ -205,7 +206,15 @@ function findVisibleRange(playerPosition: IPosition, mapDimensions: IDimensions)
         starty = mapDimensions.height - SCREEN_HEIGHT; 
     }
 
-    return [[startx, starty], [endx, endy]]
+    return {
+        start: {
+            x: startx, 
+            y: starty
+        }, end: {
+            x: endx, 
+            y: endy
+        }
+    }
 }
 
 const TYPESTRING_TO_TYPE: {[index: string]: typeof Sprite}
@@ -214,4 +223,4 @@ const TYPESTRING_TO_TYPE: {[index: string]: typeof Sprite}
     "ground": Ground
 }
 
-export default Game
+export default Game;

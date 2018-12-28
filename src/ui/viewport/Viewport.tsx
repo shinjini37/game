@@ -12,7 +12,7 @@ function Viewport(props: any) {
 
     return (
         <div className="viewport" style={style}>
-            <LocalMap />
+            <LocalMap mapname="map1"/>
             <InGameMenu />        
         </div>
     )

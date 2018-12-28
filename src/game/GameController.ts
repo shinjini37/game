@@ -5,11 +5,8 @@ import { TIMESTEP_DURATION } from './GameConstants';
 
 class GameController {
     private gameTimestep: NodeJS.Timeout | undefined;
-    private game: Game;
 
     constructor() {
-        this.game = new Game(); // TODO levelmap
-        
         this.timestep = this.timestep.bind(this);
         this.stop = this.stop.bind(this);
         this.start = this.start.bind(this);
@@ -18,7 +15,7 @@ class GameController {
     timestep() {
         const keys = Object.keys(store.getState().keysPressed);
         
-        this.game.timestep(keys);
+        Game.timestep(keys);
     }
 
     start() {
