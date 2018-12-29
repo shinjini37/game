@@ -77,7 +77,7 @@ class Game {
             const row = getTileNumber(playerPosition.y);
             const col = getTileNumber(playerPosition.x);
             
-            const delta = [0,0];
+            let delta: Vector = [0,0];
             [0, 1].forEach(l => {
                 [row-1, row, row+1].forEach(r => {
                     [col-1, col, col+1].forEach(c => {
@@ -119,8 +119,18 @@ class Game {
                             positionVector 
                         );
 
-                        delta[0] = delta[0] || delta2[0];
-                        delta[1] = delta[1] || delta2[1];
+                        if (lValue(delta2) > lValue(delta)) {
+                            delta = delta2;
+                        }
+
+                        // if (Math.abs(delta2[0]) > Math.abs(delta[0])) {
+                        //     delta[0] = delta2[0];
+                        // }
+
+                        // if (Math.abs(delta2[1]) > Math.abs(delta[1])) {
+                        //     delta[1] = delta2[1];
+                        // }
+
                         console.log(delta2);
                         console.log('moved --------');
                     });
