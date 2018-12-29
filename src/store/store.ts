@@ -8,7 +8,7 @@ import {
     PLAYER_POSITION_CHANGED_ACTION } from './Actions';
 
 import map1 from '../assets/maps/map1.json';
-import { 
+import {
     SCREEN_WIDTH, 
     SCREEN_HEIGHT, 
     IGNORE_TILE } from '../game/GameConstants';
@@ -16,7 +16,6 @@ import {
 declare global {
     interface Window { __REDUX_DEVTOOLS_EXTENSION__: any; }
 }
-
 
 export interface IPosition {
     x: number;
@@ -43,8 +42,8 @@ interface IKeyPressedState {
 interface ITile {
     [index: string]: {
         id: string;
+        type: ObjectType,
         properties: {
-            type: ObjectType,
             type_number: number,
             color: string
         }
@@ -64,10 +63,12 @@ interface IMap {
 export interface IGameState {
     keysPressed: IKeyPressedState;
     playerId: string;
+    selectedMap: string;
     visible: any;
     objects: {
         [index: string]: { // objectId => any properties
             id: string;
+            type: ObjectType;
             properties: any;
         }
     }
@@ -87,6 +88,7 @@ const PLAYER_ID = "player";
 const initialState: IGameState = {
     keysPressed: {},
     playerId: PLAYER_ID,
+    selectedMap: "map1",
     visible: {
         start: {
             x: 0,
@@ -100,6 +102,7 @@ const initialState: IGameState = {
     objects: {
         [PLAYER_ID]: {
             id: PLAYER_ID,
+            type: ObjectType.Player,
             properties: {
                 position: {
                     x: 0,
@@ -140,8 +143,8 @@ function digestMap(mapname: string, levelmap: MapLayer[]): IMap {
                     const name = getTileId(mapname, level, row, col);
                     levelMapDict[name] = {
                         id: name,
+                        type: TYPE_MAP[mapTileNumber],
                         properties: {
-                            type: TYPE_MAP[mapTileNumber],
                             type_number: mapTileNumber,
                             color: COLOR_MAP[mapTileNumber]
                         }

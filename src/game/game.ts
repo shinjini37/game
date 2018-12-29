@@ -7,18 +7,46 @@ import {
     SCREEN_HEIGHT, 
     SCREEN_WIDTH, 
     TILE_SIZE } from "./GameConstants";
-import store, { IPosition, IDimensions, getPlayer, ObjectType } from '../store/Store';
+import store, { IPosition, IDimensions, getPlayer, ObjectType, maps, getTileId } from '../store/Store';
 import { PLAYER_POSITION_CHANGED_ACTION } from "../store/Actions";
+
+type Vector = [number, number];
+
+function getNormalizedValue(speed: number, magnitude: number): number {
+    return (speed/Math.sqrt(magnitude));
+}
+
+function getNormalVector(v: Vector): Vector {
+    const magnitude = Math.abs(v[0]) + Math.abs(v[1]);
+    return [getNormalizedValue(v[0], magnitude), getNormalizedValue(v[1], magnitude)];
+}
 
 function getNormalizedSpeed(speed: number, magnitude: number): number {
     // one pixel accuracy is acceptable
     return Math.floor((speed/Math.sqrt(magnitude))*PLAYER_SPEED);
 }
 
+function lValue(v: Vector) {
+    return (Math.abs(v[0]) + Math.abs(v[1]));
+}
+
+function getTileNumber(value: number) {
+    return Math.floor(value/TILE_SIZE);
+}
+
+function withinRange(mapName: string, row: number, col: number) {
+    const dimensions = maps[mapName].dimensions;
+    return (
+        ((0 <= row) && (row < dimensions.numRows)) &&
+        ((0 <= col) && (col < dimensions.numCols))
+    );
+}
+
 class Game {
     static timestep(inputs: string[]) {
-        const playerPosition = getPlayer(store.getState()).properties.position;
-        const positionVector = [0, 0]; // x, y
+        const state = store.getState();
+        const playerPosition = getPlayer(state).properties.position;
+        const positionVector: Vector = [0, 0]; // x, y
         inputs.forEach(key => {
             switch(key) {
                 case UP:
@@ -36,19 +64,79 @@ class Game {
             }
         });
 
-        console.log(Rectangle.translationVector(
-            Rectangle.getRectangle(playerPosition),
-            Rectangle.getRectangle({x: TILE_SIZE, y: TILE_SIZE}))
-        );
-
         const positionChangeMagnitude = Math.abs(positionVector[0]) + Math.abs(positionVector[1]);
 
         if (positionChangeMagnitude > 0) {
             playerPosition.x += getNormalizedSpeed(positionVector[0], positionChangeMagnitude);
             playerPosition.y += getNormalizedSpeed(positionVector[1], positionChangeMagnitude);
 
+            const map = maps[store.getState().selectedMap];
+            
+            // next find collisions
 
-            const visible = findVisibleRange(playerPosition, {width: 25*TILE_SIZE, height: 12*TILE_SIZE});
+            const row = getTileNumber(playerPosition.y);
+            const col = getTileNumber(playerPosition.x);
+            
+            const delta = [0,0];
+            [0, 1].forEach(l => {
+                [row-1, row, row+1].forEach(r => {
+                    [col-1, col, col+1].forEach(c => {
+                        // console.log('one loop --------');
+                        // console.log(l, r, c, withinRange(map.id, r, c));
+                        
+                        if (!withinRange(map.id, r, c)) {
+                            
+                            // console.log('not within range --------');
+                            return;
+                        }
+
+                        const tileId = getTileId(map.id, l, r, c);
+
+                        // console.log(tileId);
+
+                        const obj = map.objects[tileId];
+
+                        // console.log(obj);
+                        if (obj === undefined) {
+                            // console.log('no valid object--------');
+                            
+                            return;
+                        }
+
+                        const objectType = TO_TYPE_OBJECT[obj.type];
+                        // console.log(objectType);
+                        // console.log(objectType.solid());
+                        if (!objectType.solid()) {
+                            // console.log('not solid--------');
+                            
+                            return;
+                        }
+                        console.log(objectType);
+                        
+                        const delta2 = Rectangle.translationVector(
+                            Rectangle.getRectangle(playerPosition),
+                            Rectangle.getRectangle({x: c*TILE_SIZE, y: r*TILE_SIZE}),
+                            positionVector 
+                        );
+
+                        delta[0] = delta[0] || delta2[0];
+                        delta[1] = delta[1] || delta2[1];
+                        console.log(delta2);
+                        console.log('moved --------');
+                    });
+                });
+            });
+            
+            console.log(delta);
+            playerPosition.x += delta[0];
+            playerPosition.y += delta[1];
+
+            // next find visible
+            const visible = findVisibleRange(playerPosition, 
+                {
+                    height: map.dimensions.numRows * TILE_SIZE, 
+                    width: map.dimensions.numCols * TILE_SIZE
+                });
 
             store.dispatch({
                 type: PLAYER_POSITION_CHANGED_ACTION,
@@ -85,26 +173,67 @@ class Rectangle {
     }
 
     static rightOverlap(r1: IRectangle, r2: IRectangle) {
-        return r1.x <= r2.x && r2.x < (r1.x + r1.w);
+        // is r2 to the right of r1
+        return (r1.x <= r2.x) && (r2.x < (r1.x + r1.w));
     }
 
-    static upOverlap(r1: IRectangle, r2: IRectangle){
-        return r1.y <= r2.y && r2.y < (r1.y + r1.h);
+    static bottomOverlap(r1: IRectangle, r2: IRectangle){
+        // is r2 to the top of r1
+        return (r1.y <= r2.y) && (r2.y < (r1.y + r1.h));
     }
 
     static intersects(r1: IRectangle, r2: IRectangle){
         // """Check whether `r1` and `r2` overlap.
-        // Rectangles are open on the top and right sides, and closed on
-        // the bottom and left sides; concretely, this means that the
-        // rectangle [0, 0, 1, 1] does not intersect either of [0, 1, 1, 1]
-        // or [1, 0, 1, 1].
+        // Rectangles are open on the bottom and right sides, and closed on
+        // the top and left sides
         // """
-        const xOverlap = Rectangle.rightOverlap(r1, r2) || Rectangle.rightOverlap(r2, r1);
-        const yOverlap = Rectangle.upOverlap(r1, r2) || Rectangle.upOverlap(r2, r1);
+        const xOverlap = this.rightOverlap(r1, r2) || this.rightOverlap(r2, r1);
+        const yOverlap = this.bottomOverlap(r1, r2) || this.bottomOverlap(r2, r1);
         return xOverlap && yOverlap;
     }
 
-    static translationVector(r1: IRectangle, r2: IRectangle){
+    static translationVector(r1: IRectangle, r2: IRectangle, v: Vector): Vector {
+        const noMove: Vector = [0, 0];
+        if (!this.intersects(r1, r2)){
+            return noMove;
+        }
+
+        const oppositeV = getNormalVector([-v[0], -v[1]]);
+        // r1 move horizontally, left or right
+        const moveLeftX = - ((r1.x + r1.w) - r2.x); // moving left is a -ve motion
+        const moveRightX = (r2.x + r2.w) - r1.x;
+
+        // r1 move vertically, top or bottom
+        const moveBottomY = (r2.y + r2.h) - r1.y;
+        const moveTopY = -((r1.y + r1.h) - r2.y); // moving top is a -ve motion
+
+        const deltaX = (oppositeV[0] < 0) ? moveLeftX : moveRightX;
+        const deltaY = (oppositeV[1] < 0) ? moveTopY : moveBottomY;
+        if (oppositeV[0] == 0) {
+            // move vertically
+            if (oppositeV[1] == 0) {
+                return noMove;
+            }
+
+            return [0, deltaY];
+        }
+
+        if (oppositeV[1] == 0) {
+            // move horizontally
+            return [deltaX, 0];
+        }
+
+        console.log(deltaX, deltaY);
+        const delta1: Vector = [deltaX, Math.sqrt(1-(oppositeV[0])**2)*deltaX];
+        const delta2: Vector = [Math.sqrt(1-(oppositeV[1])**2)*deltaY, deltaY];
+        console.log(delta1, delta2);
+        if (lValue(delta1) > lValue(delta2)) {
+            return delta2;
+        } 
+        return delta1;
+    }
+
+    static translationVector1(r1: IRectangle, r2: IRectangle){
         // """Compute how much `r1` needs to move to stop intersecting `r2`.
         // If `r1` does not intersect `r2`, return ``[0, 0]``.  Otherwise,
         // return a minimal pair ``[x, y]`` such that translating `r1` by
@@ -114,7 +243,10 @@ class Rectangle {
         // When two pairs ``[x, y]`` and ``[y, x]`` are tied, return the
         // one with the smallest element first.
         // """
-        if (!Rectangle.intersects(r1, r2)){
+        console.log("x", r1.x, (r1.x + r1.w), r2.x, (r2.x + r2.w));
+        console.log("y", r1.y, (r1.y + r1.h), r2.y, (r2.y + r2.h));
+        
+        if (!this.intersects(r1, r2)){
             return [0, 0];
         }
         // Moving in just one direction should be enough to deal with
@@ -125,8 +257,11 @@ class Rectangle {
         const moveRightX = (r2.x + r2.w) - r1.x;
 
         // r1 move vertically, top or bottom
-        const moveBottomY = -((r2.y + r2.h) - r1.y); // moving bottom is a -ve motion
-        const moveTopY = (r1.y + r1.h) - r2.y;
+        const moveBottomY = (r2.y + r2.h) - r1.y;
+        const moveTopY = -((r1.y + r1.h) - r2.y); // moving top is a -ve motion
+
+        console.log([moveLeftX, moveRightX]);
+        console.log([moveTopY, moveBottomY]);
         
         let res = [moveLeftX, moveBottomY];
         [moveLeftX, 0, moveRightX].forEach(x => {
@@ -151,8 +286,26 @@ class Rectangle {
     }
 }
 
+abstract class Collidable {
+    static solid() {
+        return true;
+    }
+}
+
+class Solid extends Collidable {
+}
+
+class NotSolid extends Collidable {
+    static solid() {
+        return false;
+    }
+}
+
 class Sprite {
-    constructor() {
+    static collidable: typeof Collidable;
+
+    static solid() {
+        return this.collidable.solid();
     }
 
     timestep(inputs: string[]) {
@@ -169,9 +322,7 @@ class Sprite {
 }
 
 class Player extends Sprite {
-    constructor() {
-        super();
-    }
+    static collidable = NotSolid;
 
     timestep(inputs: string[]) {
 
@@ -186,16 +337,8 @@ class Player extends Sprite {
     }
 }
 
-class Collidable {
-    static collide(other: Collidable) {
-        return ;
-    }
-}
-
 class Grass extends Sprite {
-    constructor() {
-        super();
-    }
+    static collidable = NotSolid;
 
     timestep(inputs: string[]) {
 
@@ -211,9 +354,7 @@ class Grass extends Sprite {
 }
 
 class Water extends Sprite {
-    constructor() {
-        super();
-    }
+    static collidable = Solid;
 
     timestep(inputs: string[]) {
 
@@ -225,9 +366,7 @@ class Water extends Sprite {
 }
 
 class Mountain extends Sprite {
-    constructor() {
-        super();
-    }
+    static collidable = Solid;
 
     timestep(inputs: string[]) {
 
@@ -239,9 +378,7 @@ class Mountain extends Sprite {
 }
 
 class Rock extends Sprite {
-    constructor() {
-        super();
-    }
+    static collidable = Solid;
 
     timestep(inputs: string[]) {
 

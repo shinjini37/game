@@ -4,7 +4,7 @@ import Tile from '../tile/Tile';
 import CharacterLayer from './CharacterLayer';
 
 import { getTileId, maps, IGameState} from '../../store/Store';
-import { IGNORE_TILE, TILE_SIZE } from '../../game/GameConstants';
+import { IGNORE_TILE } from '../../game/GameConstants';
 import { connect } from 'react-redux';
 
 const range = (lower: number, upper: number) => {
@@ -12,30 +12,33 @@ const range = (lower: number, upper: number) => {
     return Array.from(new Array(diff), (_, i) => i + lower);
 }
 
-// function getTileNumber(value: number) {
-//     return Math.floor(value/TILE_SIZE);
-// }
 
-const LocalMap = (props: any) => {
-    const map = maps[props.mapname];
+interface ILocalMapProps {
+    visible: any;
+    mapName: string;
+}
+
+const LocalMap = connect(mapStateToProps)((props: ILocalMapProps) => {
+    const map = maps[props.mapName];
     const dimensions = map.dimensions;
     return (
         <>
             {range(0, dimensions.numLevels).map((level) => (
-                <MapLayer key={level} layer={level}></MapLayer>
+                <MapLayer visible={props.visible} mapName={props.mapName} key={level} layer={level}></MapLayer>
             ))}
             <CharacterLayer />
         </>
     );
-};
+});
 
 interface IMapLayerProps {
     layer: number;
     visible: any;
+    mapName: string;
 }
 
-const MapLayer = connect(mapStateToProps)((props: IMapLayerProps) => {
-    const map = maps["map1"];
+const MapLayer = (props: IMapLayerProps) => {
+    const map = maps[props.mapName];
     const dimensions = map.dimensions;
     // const startRow = getTileNumber(props.visible.start.y);
     // const endRow = getTileNumber(props.visible.end.y);
@@ -48,21 +51,22 @@ const MapLayer = connect(mapStateToProps)((props: IMapLayerProps) => {
     return (
         <div className="map-layer" style={style}>
             {range(0, dimensions.numRows).map((row) => (
-                <Row key={row} layer={props.layer} row={row}></Row>
+                <Row key={row} mapName={props.mapName} layer={props.layer} row={row}></Row>
             ))}
         </div>
     )
-});
+};
 
 
 interface IRowProps {
     // visible: any;
     row: number;
     layer: number;
+    mapName: string;
 }
 
 const Row = (props: IRowProps) => {
-    const map = maps["map1"];
+    const map = maps[props.mapName];
     const dimensions = map.dimensions;
 
     const objects = map.objects;
@@ -73,7 +77,7 @@ const Row = (props: IRowProps) => {
     return (
         <div className="row">
             {range(0, dimensions.numCols).map((col) => {
-                const tileId = getTileId("map1", props.layer, props.row, col);
+                const tileId = getTileId(props.mapName, props.layer, props.row, col);
                 const properties = (objects[tileId] || {}).properties || {};
                 return (
                     <Tile key={col}
@@ -86,7 +90,8 @@ const Row = (props: IRowProps) => {
 
 function mapStateToProps(state: IGameState) {
     return {
-        visible: state.visible
+        visible: state.visible,
+        mapName: state.selectedMap
     };
 }
 
