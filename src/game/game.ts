@@ -119,17 +119,17 @@ class Game {
                             positionVector 
                         );
 
-                        if (lValue(delta2) > lValue(delta)) {
-                            delta = delta2;
+                        // if (lValue(delta2) > lValue(delta)) {
+                        //     delta = delta2;
+                        // }
+
+                        if (Math.abs(delta2[0]) > Math.abs(delta[0])) {
+                            delta[0] = delta2[0];
                         }
 
-                        // if (Math.abs(delta2[0]) > Math.abs(delta[0])) {
-                        //     delta[0] = delta2[0];
-                        // }
-
-                        // if (Math.abs(delta2[1]) > Math.abs(delta[1])) {
-                        //     delta[1] = delta2[1];
-                        // }
+                        if (Math.abs(delta2[1]) > Math.abs(delta[1])) {
+                            delta[1] = delta2[1];
+                        }
 
                         console.log(delta2);
                         console.log('moved --------');
@@ -203,6 +203,31 @@ class Rectangle {
     }
 
     static translationVector(r1: IRectangle, r2: IRectangle, v: Vector): Vector {
+        const noMove: Vector = [0, 0];
+        if (!this.intersects(r1, r2)){
+            return noMove;
+        }
+
+        const oppositeV = [-v[0], -v[1]];
+        // r1 move horizontally, left or right
+        const moveLeftX = - ((r1.x + r1.w) - r2.x); // moving left is a -ve motion
+        const moveRightX = (r2.x + r2.w) - r1.x;
+
+        // r1 move vertically, top or bottom
+        const moveBottomY = (r2.y + r2.h) - r1.y;
+        const moveTopY = -((r1.y + r1.h) - r2.y); // moving top is a -ve motion
+
+        const deltaX = (oppositeV[0] < 0) ? moveLeftX : moveRightX;
+        const deltaY = (oppositeV[1] < 0) ? moveTopY : moveBottomY;
+        
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            return [0, deltaY];
+        }
+
+        return [deltaX, 0];
+    }
+
+    static translationVector3(r1: IRectangle, r2: IRectangle, v: Vector): Vector {
         const noMove: Vector = [0, 0];
         if (!this.intersects(r1, r2)){
             return noMove;
