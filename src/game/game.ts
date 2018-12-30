@@ -227,7 +227,7 @@ class Rectangle {
         return [deltaX, 0];
     }
 
-    static translationVector3(r1: IRectangle, r2: IRectangle, v: Vector): Vector {
+    static translationVector2(r1: IRectangle, r2: IRectangle, v: Vector): Vector {
         const noMove: Vector = [0, 0];
         if (!this.intersects(r1, r2)){
             return noMove;
