@@ -8,29 +8,15 @@ import {
     SCREEN_WIDTH, 
     TILE_SIZE,
     IPosition, 
-    IDimensions } from "./game_constants";
+    IDimensions,
+    IVector } from "./game_constants";
 import store, { getPlayer, ObjectType, maps } from '../store/store';
 import { PLAYER_POSITION_CHANGED_ACTION } from "../store/actions";
 import { range } from '../utils/utils';
 import GameMap from './GameMap';
+import Rectangle from './Rectangle';
 
-type Vector = [number, number];
-
-function getNormalizedValue(speed: number, magnitude: number): number {
-    return (speed/Math.sqrt(magnitude));
-}
-
-function getNormalVector(v: Vector): Vector {
-    const magnitude = Math.abs(v[0]) + Math.abs(v[1]);
-    return [getNormalizedValue(v[0], magnitude), getNormalizedValue(v[1], magnitude)];
-}
-
-function getNormalizedSpeed(speed: number, magnitude: number): number {
-    // one pixel accuracy is acceptable
-    return Math.floor((speed/Math.sqrt(magnitude))*PLAYER_SPEED);
-}
-
-function lValue(v: Vector) {
+function lValue(v: IVector) {
     return (Math.abs(v[0]) + Math.abs(v[1]));
 }
 
@@ -64,66 +50,6 @@ class Game {
     }
 }
 
-interface IRectangle {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-}
-
-class Rectangle {
-    // """A rectangle object to help with collision detection and resolution."""
-
-    static getRectangle(position: IPosition): IRectangle {
-        return {
-            x: position.x,
-            y: position.y,
-            h: TILE_SIZE,
-            w: TILE_SIZE
-        }
-    }
-
-    static rightOverlap(r1: IRectangle, r2: IRectangle) {
-        // is r2 to the right of r1
-        return (r1.x <= r2.x) && (r2.x < (r1.x + r1.w));
-    }
-
-    static bottomOverlap(r1: IRectangle, r2: IRectangle){
-        // is r2 to the top of r1
-        return (r1.y <= r2.y) && (r2.y < (r1.y + r1.h));
-    }
-
-    static intersects(r1: IRectangle, r2: IRectangle){
-        // """Check whether `r1` and `r2` overlap.
-        // Rectangles are open on the bottom and right sides, and closed on
-        // the top and left sides
-        // """
-        const xOverlap = this.rightOverlap(r1, r2) || this.rightOverlap(r2, r1);
-        const yOverlap = this.bottomOverlap(r1, r2) || this.bottomOverlap(r2, r1);
-        return xOverlap && yOverlap;
-    }
-
-    static translationVector(r1: IRectangle, r2: IRectangle, v: Vector): Vector {
-        if (!this.intersects(r1, r2)){
-            return [0, 0];
-        }
-        v = getNormalVector(v);
-
-        // r1 move horizontally, left or right
-        const moveLeftX = - ((r1.x + r1.w) - r2.x); // moving left is a -ve motion
-        const moveRightX = (r2.x + r2.w) - r1.x;
-
-        // r1 move vertically, top or bottom
-        const moveBottomY = (r2.y + r2.h) - r1.y;
-        const moveTopY = -((r1.y + r1.h) - r2.y); // moving top is a -ve motion
-
-        const deltaX = (v[0] > 0) ? moveLeftX : moveRightX;
-        const deltaY = (v[1] > 0) ? moveTopY : moveBottomY;
-
-        return [Math.abs(v[0])*deltaX, Math.abs(v[1])*deltaY];
-    }
-}
-
 abstract class Collidable {
     static solid() {
         return true;
@@ -146,24 +72,16 @@ class Sprite {
         return this.collidable.solid();
     }
 
-    timestep(inputs: string[]) {
+    static timestep(inputs: string[]) {
 
-    }
-
-    render() {
-        
-    }
-
-    static doThing() {
-        return "Sprite";
     }
 }
 
 class Player extends Sprite {
     static collidable = NotSolid;
 
-    static handleKeys(inputs: string[]): Vector {
-        let positionVector: Vector = [0, 0];
+    static handleKeys(inputs: string[]): IVector {
+        let positionVector: IVector = [0, 0];
         inputs.forEach(key => {
             switch(key) {
                 case UP:
@@ -201,7 +119,7 @@ class Player extends Sprite {
             const row = getTileNumber(playerPosition.y);
             const col = getTileNumber(playerPosition.x);
             
-            let delta: Vector = [0,0];
+            let delta: IVector = [0,0];
             range(0, map.dimensions.numLevels).forEach(l => {
                 getNeighbors(row, col, (r, c) => {
                     if (withinRange(map.id, r, c)) {
@@ -254,65 +172,37 @@ class Player extends Sprite {
             });
         }   
     }
-
-    render() {
-        
-    }
-
-    static doThing() {
-        return "Player";
-    }
 }
 
 class Grass extends Sprite {
     static collidable = NotSolid;
 
-    timestep(inputs: string[]) {
+    static timestep(inputs: string[]) {
 
-    }
-
-    render() {
-        
-    }
-
-    static doThing() {
-        return "Ground";
     }
 }
 
 class Water extends Sprite {
     static collidable = Solid;
 
-    timestep(inputs: string[]) {
+    static timestep(inputs: string[]) {
 
-    }
-
-    render() {
-        
     }
 }
 
 class Mountain extends Sprite {
     static collidable = Solid;
 
-    timestep(inputs: string[]) {
+    static timestep(inputs: string[]) {
 
-    }
-
-    render() {
-        
     }
 }
 
 class Rock extends Sprite {
     static collidable = Solid;
 
-    timestep(inputs: string[]) {
+    static timestep(inputs: string[]) {
 
-    }
-
-    render() {
-        
     }
 }
 

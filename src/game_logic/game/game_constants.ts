@@ -15,6 +15,8 @@ const TIMESTEP_DURATION = 150;
 const IGNORE_TILE = 0;
 
 
+export type IVector = [number, number];
+
 export interface IPosition {
     x: number;
     y: number;
