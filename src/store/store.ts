@@ -35,9 +35,7 @@ enum ObjectType {
     Player
 }
 
-interface IKeyPressedState {
-    [index: string]: boolean;
-}
+type IKeyPressedState = string[];
 
 interface ITile {
     [index: string]: {
@@ -86,7 +84,7 @@ interface PayloadAction<T> extends Action<T> {
 const PLAYER_ID = "player";
 
 const initialState: IGameState = {
-    keysPressed: {},
+    keysPressed: [],
     playerId: PLAYER_ID,
     selectedMap: "map1",
     visible: {
@@ -174,11 +172,11 @@ function getTileId(mapName:string, level:number, row:number, col:number) {
 const reducer = (state: IGameState = initialState, action: PayloadAction<string>): IGameState => {
     switch (action.type) {
         case KEY_DOWN_ACTION: {
-            const newKeys = handleKey(state.keysPressed, action.payload.key, false);
+            const newKeys = handleKey(state.keysPressed, action.payload.key, true);
             return dotProp.set(state, 'keysPressed', newKeys);
         }
         case KEY_UP_ACTION: {
-            const newKeys = handleKey(state.keysPressed, action.payload.key, true);
+            const newKeys = handleKey(state.keysPressed, action.payload.key, false);
             return dotProp.set(state, 'keysPressed', newKeys);
         }
         case PLAYER_POSITION_CHANGED_ACTION:
@@ -198,14 +196,20 @@ const reducer = (state: IGameState = initialState, action: PayloadAction<string>
     }
 }
 
-function handleKey(previousKeys: IKeyPressedState, newKey: string, removing: boolean) {
-    const newKeys = { ...previousKeys };
-    if (removing) {
-        if (newKeys.hasOwnProperty(newKey)) {
-            delete newKeys[newKey];
+function handleKey(previousKeys: IKeyPressedState, newKey: string, adding: boolean) {
+    // Adds new keys to the end.
+    const newKeys: IKeyPressedState = [];
+
+    // copy everything other than the key
+    previousKeys.forEach(key => {
+        if (key != newKey) {
+            newKeys.push(key);
         }
-    } else {
-        newKeys[newKey] = true;
+    });
+
+    // only add if not already there
+    if (adding) {
+        newKeys.push(newKey);
     }
 
     return newKeys;

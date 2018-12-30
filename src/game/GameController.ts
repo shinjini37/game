@@ -13,7 +13,7 @@ class GameController {
     }
 
     timestep() {
-        const keys = Object.keys(store.getState().keysPressed);
+        const keys = store.getState().keysPressed;
         
         Game.timestep(keys);
     }

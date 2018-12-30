@@ -46,20 +46,20 @@ class Game {
     static timestep(inputs: string[]) {
         const state = store.getState();
         const playerPosition = getPlayer(state).properties.position;
-        const positionVector: Vector = [0, 0]; // x, y
+        let positionVector: Vector = [0, 0]; // x, y
         inputs.forEach(key => {
             switch(key) {
                 case UP:
-                    positionVector[1] -= 1;
+                    positionVector = [0, -1];
                     break;
                 case DOWN:
-                    positionVector[1] += 1;
+                    positionVector = [0, 1];
                     break;
                 case LEFT:
-                    positionVector[0] -= 1;
+                    positionVector = [-1, 0];
                     break;
                 case RIGHT:
-                    positionVector[0] += 1;
+                    positionVector = [1, 0];
                     break;
             }
         });
@@ -207,8 +207,9 @@ class Rectangle {
         if (!this.intersects(r1, r2)){
             return noMove;
         }
-
+        v = getNormalVector(v);
         const oppositeV = [-v[0], -v[1]];
+        console.log(oppositeV);
         // r1 move horizontally, left or right
         const moveLeftX = - ((r1.x + r1.w) - r2.x); // moving left is a -ve motion
         const moveRightX = (r2.x + r2.w) - r1.x;
@@ -220,11 +221,9 @@ class Rectangle {
         const deltaX = (oppositeV[0] < 0) ? moveLeftX : moveRightX;
         const deltaY = (oppositeV[1] < 0) ? moveTopY : moveBottomY;
         
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            return [0, deltaY];
-        }
+        console.log(deltaX, deltaY);
 
-        return [deltaX, 0];
+        return [Math.abs(v[0])*deltaX, Math.abs(v[1])*deltaY];
     }
 
     static translationVector2(r1: IRectangle, r2: IRectangle, v: Vector): Vector {
