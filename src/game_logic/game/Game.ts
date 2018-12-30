@@ -104,7 +104,8 @@ class Player extends Sprite {
     static timestep(inputs: string[]) {
         const positionVector = this.handleKeys(inputs);
         const state = store.getState();
-        const playerPosition = getPlayer(state).properties.position;
+        const playerPositionOriginal = {...getPlayer(state).properties.position};
+        const playerPosition = {...getPlayer(state).properties.position};
 
         const positionChangeMagnitude = Math.abs(positionVector[0]) + Math.abs(positionVector[1]);
 
@@ -166,8 +167,12 @@ class Player extends Sprite {
             store.dispatch({
                 type: PLAYER_POSITION_CHANGED_ACTION,
                 payload: {
-                    playerPosition: {...playerPosition},
-                    visible: {...visible}
+                    playerPosition,
+                    playerPositionDiff: {
+                        x: playerPosition.x - playerPositionOriginal.x,
+                        y: playerPosition.y - playerPositionOriginal.y
+                    },
+                    visible
                 }
             });
         }   

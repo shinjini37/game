@@ -1,6 +1,6 @@
 
 const TILE_SIZE = 32;
-const SCREEN_WIDTH = 320;
+const SCREEN_WIDTH = 768;
 const SCREEN_HEIGHT = 320;
 
 const PLAYER_SPEED = TILE_SIZE;
@@ -10,7 +10,7 @@ const DOWN = "ArrowDown";
 const LEFT = "ArrowLeft";
 const RIGHT = "ArrowRight";
 
-const TIMESTEP_DURATION = 150;
+const TIMESTEP_DURATION = 300;
 
 const IGNORE_TILE = 0;
 

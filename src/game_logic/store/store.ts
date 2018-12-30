@@ -71,6 +71,10 @@ const initialState: IGameState = {
                     x: 0,
                     y: 0
                 },
+                positionDiff: {
+                    x: 0,
+                    y: 0
+                },
                 color: {value:"red"}
             }
         }
@@ -102,7 +106,12 @@ const reducer = (state: IGameState = initialState, action: PayloadAction<string>
                 `visible`,
                 action.payload.visible
             );
-            return newState2;
+            const newState3 = dotProp.set(
+                newState2,
+                `objects.${PLAYER_ID}.properties.positionDiff`,
+                action.payload.playerPositionDiff
+            );
+            return newState3;
         default:
             return state;
     }
