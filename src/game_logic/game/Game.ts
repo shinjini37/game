@@ -9,7 +9,9 @@ import {
     TILE_SIZE,
     IPosition, 
     IDimensions,
-    IVector } from "./game_constants";
+    IVector, 
+    TIMESTEP_DURATION,
+    WALK_CYCLE} from "./game_constants";
 import store, { getPlayer, ObjectType, maps } from '../store/store';
 import { PLAYER_POSITION_CHANGED_ACTION } from "../store/actions";
 import { range } from '../utils/utils';
@@ -40,9 +42,15 @@ function withinRange(mapName: string, row: number, col: number) {
     );
 }
 
+let count = 0;
+
 class Game {
     static timestep(inputs: string[]) {
-        Player.timestep(inputs);
+        if (count*TIMESTEP_DURATION == WALK_CYCLE) {
+            Player.timestep(inputs);
+            count = 0;
+        }
+        count += 1;
     }
 
     render() {

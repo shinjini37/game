@@ -10,7 +10,8 @@ const DOWN = "ArrowDown";
 const LEFT = "ArrowLeft";
 const RIGHT = "ArrowRight";
 
-const TIMESTEP_DURATION = 300;
+const TIMESTEP_DURATION = 20;
+const WALK_CYCLE = 5*TIMESTEP_DURATION;
 
 const IGNORE_TILE = 0;
 
@@ -45,5 +46,6 @@ export {
     RIGHT, 
     PLAYER_SPEED, 
     TIMESTEP_DURATION, 
+    WALK_CYCLE,
     IGNORE_TILE,
     ObjectType };
