@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
-import MainMenu from './ui/main_menu/MainMenu';
-import LocalMap from './ui/local_map/LocalMap';
 import InputCapture from './ui/input_capture/InputCapture';
-import store from './store/Store';
+import store from './game_logic/store/store';
 import { Unsubscribe } from 'redux';
-import GameController from './game/GameController';
+import GameController from './game_logic/game/GameController';
 import Viewport from './ui/viewport/Viewport';
 
 class App extends Component {

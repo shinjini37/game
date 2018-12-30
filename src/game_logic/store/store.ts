@@ -5,58 +5,23 @@ import * as dotProp from './dot-prop-immutable-reexport';
 import { 
     KEY_DOWN_ACTION, 
     KEY_UP_ACTION, 
-    PLAYER_POSITION_CHANGED_ACTION } from './Actions';
+    PLAYER_POSITION_CHANGED_ACTION } from './actions';
 
-import map1 from '../assets/maps/map1.json';
+import map1 from '../../assets/maps/map1.json';
 import {
-    SCREEN_WIDTH, 
-    SCREEN_HEIGHT, 
-    IGNORE_TILE } from '../game/GameConstants';
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT,
+    ObjectType } from '../game/game_constants';
+
+import GameMap, { IGameMap } from '../game/GameMap';
 
 declare global {
     interface Window { __REDUX_DEVTOOLS_EXTENSION__: any; }
 }
 
-export interface IPosition {
-    x: number;
-    y: number;
-}
-
-export interface IDimensions {
-    width: number;
-    height: number;
-}
-
-enum ObjectType {
-    Grass,
-    Rock,
-    Water,
-    Mountain,
-    Player
-}
 
 type IKeyPressedState = string[];
 
-interface ITile {
-    [index: string]: {
-        id: string;
-        type: ObjectType,
-        properties: {
-            type_number: number,
-            color: string
-        }
-    }
-}
-
-interface IMap {
-    id: string;
-    objects: ITile;
-    dimensions: {
-        numLevels: number,
-        numRows: number,
-        numCols: number
-    }
-}
 
 export interface IGameState {
     keysPressed: IKeyPressedState;
@@ -112,62 +77,9 @@ const initialState: IGameState = {
     }
 };
 
-type MapLayer = number[][];
-
-
-const TYPE_MAP: {[index: number]: ObjectType} = {
-    1: ObjectType.Grass,
-    2: ObjectType.Rock,
-    10: ObjectType.Water,
-    20: ObjectType.Mountain
+const maps: {[index: string]: IGameMap} = {
+    "map1": GameMap.digestMap("map1", map1)
 };
-
-const COLOR_MAP: {[index: number]: string} = {
-    1: '#a36e28',
-    2: '#a69162',
-    10: '#4d9bbd',
-    20: '#703227',
-};
-
-function digestMap(mapname: string, levelmap: MapLayer[]): IMap {
-    const levelMapDict: ITile = {};
-    const numLevels = levelmap.length;
-    const numRows = levelmap[0].length;
-    const numCols = levelmap[0][0].length;
-    levelmap.forEach((mapLayer: MapLayer, level: number) => {
-        mapLayer.forEach((mapRow: number[], row: number) => {
-            mapRow.forEach((mapTileNumber: number, col: number) => {
-                if (mapTileNumber != IGNORE_TILE) {
-                    const name = getTileId(mapname, level, row, col);
-                    levelMapDict[name] = {
-                        id: name,
-                        type: TYPE_MAP[mapTileNumber],
-                        properties: {
-                            type_number: mapTileNumber,
-                            color: COLOR_MAP[mapTileNumber]
-                        }
-                    }; 
-                }
-            });
-        });
-    });
-
-    const dimensions = {
-        numLevels,
-        numRows,
-        numCols
-    }
-    const objects = levelMapDict;
-    return {id: mapname, dimensions, objects};
-}
-
-const maps: {[index: string]: IMap} = {
-    "map1": digestMap("map1", map1)
-};
-
-function getTileId(mapName:string, level:number, row:number, col:number) {
-    return  `${mapName}(${level}, ${row}, ${col})`;
-}
 
 const reducer = (state: IGameState = initialState, action: PayloadAction<string>): IGameState => {
     switch (action.type) {
@@ -220,4 +132,4 @@ const store = createStore(reducer,
      /*TODO , savedGameState */);
 
 export default store;
-export { getTileId, maps, ObjectType, getPlayer};
+export { maps, ObjectType, getPlayer };

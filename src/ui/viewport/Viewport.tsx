@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import LocalMap from '../local_map/LocalMap';
 import InGameMenu from '../in_game_menu/InGameMenu';
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../../game/GameConstants';
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../../game_logic/game/game_constants';
 import './Viewport.css';
 
 function Viewport(props: any) {

@@ -1,6 +1,6 @@
-import store from '../store/Store';
+import store from '../store/store';
 import Game from './Game';
-import { TIMESTEP_DURATION } from './GameConstants';
+import { TIMESTEP_DURATION } from './game_constants';
 
 
 class GameController {

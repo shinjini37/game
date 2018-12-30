@@ -10,9 +10,28 @@ const DOWN = "ArrowDown";
 const LEFT = "ArrowLeft";
 const RIGHT = "ArrowRight";
 
-const TIMESTEP_DURATION = 75;
+const TIMESTEP_DURATION = 150;
 
 const IGNORE_TILE = 0;
+
+
+export interface IPosition {
+    x: number;
+    y: number;
+}
+
+export interface IDimensions {
+    width: number;
+    height: number;
+}
+
+enum ObjectType {
+    Grass,
+    Rock,
+    Water,
+    Mountain,
+    Player
+}
 
 export {
     TILE_SIZE, 
@@ -24,4 +43,5 @@ export {
     RIGHT, 
     PLAYER_SPEED, 
     TIMESTEP_DURATION, 
-    IGNORE_TILE };
+    IGNORE_TILE,
+    ObjectType };

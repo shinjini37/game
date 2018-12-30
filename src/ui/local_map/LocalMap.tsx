@@ -3,15 +3,12 @@ import './LocalMap.css';
 import Tile from '../tile/Tile';
 import CharacterLayer from './CharacterLayer';
 
-import { getTileId, maps, IGameState} from '../../store/Store';
-import { IGNORE_TILE } from '../../game/GameConstants';
+import { maps, IGameState } from '../../game_logic/store/store';
+import GameMap from '../../game_logic/game/GameMap';
+import { IGNORE_TILE } from '../../game_logic/game/game_constants';
 import { connect } from 'react-redux';
 
-const range = (lower: number, upper: number) => {
-    const diff = upper - lower + 1;
-    return Array.from(new Array(diff), (_, i) => i + lower);
-}
-
+import { range } from '../../game_logic/utils/utils';
 
 interface ILocalMapProps {
     visible: any;
@@ -77,7 +74,7 @@ const Row = (props: IRowProps) => {
     return (
         <div className="row">
             {range(0, dimensions.numCols).map((col) => {
-                const tileId = getTileId(props.mapName, props.layer, props.row, col);
+                const tileId = GameMap.getTileId(props.mapName, props.layer, props.row, col);
                 const properties = (objects[tileId] || {}).properties || {};
                 return (
                     <Tile key={col}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import './Tile.css'
-import { TILE_SIZE, IGNORE_TILE } from '../../game/GameConstants';
+import { TILE_SIZE, IGNORE_TILE } from '../../game_logic/game/game_constants';
 
 
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { TILE_SIZE } from '../../game/GameConstants';
+import { TILE_SIZE } from '../../game_logic/game/game_constants';
 import { connect } from 'react-redux';
-import store, { IGameState, getPlayer } from '../../store/Store';
+import store, { IGameState, getPlayer } from '../../game_logic/store/store';
 
 const _Character = function (props: any) {
     const style = {

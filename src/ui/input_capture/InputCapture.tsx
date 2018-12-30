@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { KEY_DOWN_ACTION, KEY_UP_ACTION} from '../../store/Actions';
-import { UP, DOWN, LEFT, RIGHT } from '../../game/GameConstants';
+import { KEY_DOWN_ACTION, KEY_UP_ACTION} from '../../game_logic/store/actions';
+import { UP, DOWN, LEFT, RIGHT } from '../../game_logic/game/game_constants';
 
 interface IInputCaptureProperties {
     onKeyDown: (e: KeyboardEvent) => void;
